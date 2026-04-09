@@ -1,54 +1,41 @@
 """
 W8 分組實作：MCP Server
-主題：（填入你們選的主題）
-
-分工說明：
-- 各組員在 tools/ 建立自己的 Tool，import 到這裡用 @mcp.tool() 註冊
-- 指定一位組員負責 @mcp.resource()
-- 指定一位組員負責 @mcp.prompt()
+主題：旅遊顧問 MCP Server (純搜尋美食、景點版)
 """
 
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("第X組-server")
+# 匯入各 Tool 的資料取得函式
+from tools.web_search_tool import web_search_data
+
+mcp = FastMCP("旅遊顧問-server")
 
 
 # ════════════════════════════════
-#  Tools：各組員各自負責一個 Tool
+#  Tools：核心搜尋工具
 # ════════════════════════════════
-
-# 範例（替換成你們自己的 Tool）：
-# from tools.weather_tool import get_weather_data
-#
-# @mcp.tool()
-# def get_weather(city: str) -> str:
-#     """取得指定城市的即時天氣資訊。
-#     當使用者詢問天氣、溫度、是否該帶傘時使用。"""
-#     return get_weather_data(city)
-
 
 @mcp.tool()
-def hello(name: str) -> str:
-    """跟使用者打招呼。測試用，確認 MCP Server 正常運作。"""
-    return f"你好，{name}！MCP Server 運作正常 🎉"
+def web_search(query: str) -> str:
+    """搜尋景點、美食等旅遊資訊。
+    當使用者想查詢特定地點的景點推薦、美食餐廳、旅遊攻略時使用。
+    例如：「台北美食推薦」、「京都必去景點」、「花蓮好吃的」。"""
+    return web_search_data(query)
 
 
 # ════════════════════════════════
 #  Resource：提供靜態參考資料
-#  URI 格式：info://名稱 或 docs://名稱
+#  URI 格式：info://名稱
 # ════════════════════════════════
 
-# 範例（替換成符合你們主題的內容）：
-#
-# @mcp.resource("info://tips")
-# def get_tips() -> str:
-#     """（主題）的實用小提示"""
-#     return (
-#         "實用小提示：\n"
-#         "- 提示 1\n"
-#         "- 提示 2\n"
-#         "- 提示 3"
-#     )
+@mcp.resource("info://travel-tips")
+def get_travel_tips() -> str:
+    """旅行必帶物品與注意事項清單"""
+    return (
+        "找尋美食與景點的小提示：\n"
+        "- 輸入具體的地區與食物種類（如：台南 牛肉湯 推薦）能找到更精確的結果！\n"
+        "- 搜尋景點時可以加上『必去』或『私房景點』等關鍵字哦！"
+    )
 
 
 # ════════════════════════════════
@@ -56,20 +43,17 @@ def hello(name: str) -> str:
 #  使用者透過 /use <名稱> [參數] 呼叫
 # ════════════════════════════════
 
-# 範例（替換成符合你們主題的內容）：
-#
-# @mcp.prompt()
-# def my_plan(topic: str) -> str:
-#     """產生（主題）計畫的提示詞"""
-#     return (
-#         f"請幫我規劃關於 {topic} 的計畫：\n"
-#         f"1. 先使用相關工具取得資訊\n"
-#         f"2. 根據資訊提供 3 個具體建議\n"
-#         f"3. 附上一則笑話或建議讓我開心\n"
-#         f"請用繁體中文回答。"
-#     )
+@mcp.prompt()
+def search_local(city: str) -> str:
+    """產生當地美食與景點探索的提示詞"""
+    return (
+        f"我想到 {city} 去走走。請幫我搜尋並整理出：\n"
+        f"1. {city} 3個必吃的在地美食推薦\n"
+        f"2. {city} 2個熱門的旅遊景點\n"
+        f"請你一定要使用 web_search 工具來查詢最新的推薦名單，然後用生動活潑的語氣回覆我！"
+    )
 
 
 if __name__ == "__main__":
-    print("MCP Server 啟動中... http://localhost:8000")
+    print("MCP Server (純搜尋版) 啟動中... http://localhost:8000")
     mcp.run(transport="sse")
