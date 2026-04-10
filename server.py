@@ -4,16 +4,25 @@ W8 分組實作：MCP Server
 """
 
 from mcp.server.fastmcp import FastMCP
+from tools.weather_tool import get_weather
 
 # 匯入各 Tool 的資料取得函式
 from tools.web_search_tool import web_search_data
 
 mcp = FastMCP("旅遊顧問-server")
+mcp = FastMCP("travel-advisor")
 
 
 # ════════════════════════════════
 #  Tools：核心搜尋工具
 # ════════════════════════════════
+
+# 把你的函式包裝成 MCP Tool
+@mcp.tool()
+def fetch_weather(city: str) -> str:
+    # 直接呼叫剛剛寫好的邏輯
+    return get_weather(city)
+
 
 @mcp.tool()
 def web_search(query: str) -> str:
