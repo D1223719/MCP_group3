@@ -36,3 +36,7 @@ htmlcov/
 # ── 日誌 ────────────────────────────────
 *.log
 logs/
+.env
+.venv/
+__pycache__/
+*.pyc
