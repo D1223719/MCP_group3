@@ -1,19 +1,20 @@
 # MCP Server + AI agent 分組實作
 
 > 課程：AI Agent 開發 — MCP（Model Context Protocol）
-> 主題：（填入你們選的主題）
+> 主題：旅遊顧問 MCP Server (純搜尋美食、景點版)
 
 ---
 
 ## Server 功能總覽
 
-> 說明這個 MCP Server 提供哪些 Tool
+> 這是整合天氣提醒、旅遊知識問答與景點美食搜尋的旅遊顧問 Server。提供下列 Tool：
 
-| Tool 名稱                 | 功能說明     | 負責組員 |
-| ------------------------- | ------------ | -------- |
-| （範例：`get_weather`） | 查詢即時天氣 |          |
-|                           |              |          |
-|                           |              |          |
+| Tool 名稱                 | 功能說明            | 負責組員 |
+| ------------------------- | ------------------- | -------- |
+| `fetch_weather`           | 查詢指定城市即時天氣 |          |
+| `web_search`              | 搜尋景點、美食等資訊 |          |
+| `travel_search`           | 進階旅遊與美食搜尋   |          |
+| `travel_trivia`           | 取得旅途知識問答題   |          |
 
 ---
 
@@ -21,9 +22,10 @@
 
 | 姓名 | 負責功能            | 檔案          | 使用的 API |
 | ---- | ------------------- | ------------- | ---------- |
-|      |                     | `tools/`    |            |
-|      |                     | `tools/`    |            |
-|      |                     | `tools/`    |            |
+|      |                     | `tools/weather_tool.py`       | wttr.in API       |
+|      |                     | `tools/web_search_tool.py`    | DuckDuckGo API    |
+|      |                     | `tools/travel_search_tool.py` | DuckDuckGo API    |
+|      |                     | `tools/get_trivia.py`         | OpenTDB API       |
 |      | Resource + Prompt   | `server.py` | —         |
 |      | Agent（用 AI 產生） | `agent.py`  | Gemini API |
 
@@ -36,10 +38,10 @@
 ├── agent.py               # MCP Client + Gemini Agent（用 AI 產生）
 ├── tools/
 │   ├── __init__.py
-│   ├── example_tool.py    # 範例（可刪除）
-│   ├── xxx_tool.py        # 組員 A 的 Tool
-│   ├── xxx_tool.py        # 組員 B 的 Tool
-│   └── xxx_tool.py        # 組員 C 的 Tool
+│   ├── weather_tool.py    # 查詢天氣的 Tool
+│   ├── web_search_tool.py # 景點/美食搜尋 Tool
+│   ├── travel_search_tool.py # 進階美食/景點搜尋 Tool
+│   └── get_trivia.py      # 旅途知識問答 Tool
 ├── requirements.txt
 ├── .env.example
 ├── .gitignore
@@ -85,33 +87,76 @@ python agent.py
 
 ## 各 Tool 說明
 
-### `tool_name`（負責：姓名）
+### `fetch_weather`（負責：姓名）
 
-- **功能**：
-- **使用 API**：
-- **參數**：
+- **功能**：取得指定城市的即時天氣資訊，包含溫度、體感溫度和天氣狀況。當使用者詢問天氣、溫度、是否該帶傘時使用。
+- **使用 API**：https://wttr.in/{city}?format=j1
+- **參數**：`city` (字串型態) - 目標城市名稱，如 "Taipei"。
 - **回傳範例**：
-
-```python
-@mcp.tool()
-def tool_name(param: str) -> str:
-    """Tool 的 docstring（這就是 AI 看到的描述）"""
-    ...
+```text
+🌍 Taipei 即時天氣：
+  🌡️ 溫度：25°C（體感 26°C）
+  ☁️ 天氣狀況：Partly cloudy
 ```
 
-### `tool_name`（負責：姓名）
+---
 
-- **功能**：
-- **使用 API**：
-- **參數**：
+### `web_search`（負責：姓名）
+
+- **功能**：使用 DuckDuckGo 搜尋景點、美食等旅遊資訊，回傳前 5 筆結果。當查詢特定地區景點或推薦美食時使用。
+- **使用 API**：duckduckgo-search 套件
+- **參數**：`query` (字串型態) - 搜尋關鍵字，例如 "台北美食推薦"。
 - **回傳範例**：
+```text
+🔍 搜尋「台北美食推薦」的結果：
 
-### `tool_name`（負責：姓名）
+1. **台北美食總整理**
+2. **2026必吃在地小吃**
+```
 
-- **功能**：
-- **使用 API**：
+---
+
+### `travel_search`（負責：姓名）
+
+- **功能**：進階旅遊與美食搜尋，除標題外還附帶摘要與參考連結，並且可指定回傳結果數量。
+- **使用 API**：duckduckgo-search 套件
 - **參數**：
+  - `query` (字串型態) - 搜尋關鍵字。
+  - `max_results` (整數) - 最多回傳幾筆資料，預設為 5 筆。
 - **回傳範例**：
+```text
+🔍 關於「台南 國華街 美食」的搜尋結果（取前 3 筆）：
+
+1. 首選排隊美食名稱
+   摘要：這是當地非常經典的...
+   參考連結：https://...
+```
+
+---
+
+### `travel_trivia`（負責：姓名）
+
+- **功能**：取得隨機的旅途知識問答題（四選一），增加旅途趣味，提供長途搭車時娛樂。
+- **使用 API**：Open Trivia Database (https://opentdb.com/api.php)
+- **參數**：
+  - `amount` (整數) - 題目數量，限制 1~10 題。
+  - `difficulty` (字串) - 題目難易度，支援 easy, medium, hard。
+- **回傳範例**：
+```text
+[Trivia] 旅途知識問答（共 3 題）
+
+-- 第 1 題 ---------------------------
+類別：Geography
+難度：[Easy] 簡單
+問題：What is the capital of Japan?
+
+   A. Beijing
+   B. Seoul
+   C. Bangkok
+   D. Tokyo
+
+正確答案：Tokyo
+```
 
 ---
 
@@ -119,8 +164,9 @@ def tool_name(param: str) -> str:
 
 ### 遇到最難的問題
 
-> 寫下這次實作遇到最困難的事，以及怎麼解決的
+> 在實作中遇到最難的問題是連線 Gemini API 時經常遇到 "429 RESOURCE_EXHAUSTED" 的配額問題，需要準備額度充分的 API Key。另外，在 Windows 環境下使用 Python 終端機進行中文對話時，當輸入中文字串傳遞到底層網路模組 `httpx` 會因為預設編碼並未轉碼而拋出 `UnicodeEncodeError (surrogates not allowed)`。後來經過摸索，發現只要在主程式 (`agent.py`) 最前端加入 `sys.stdin.reconfigure(encoding='utf-8')`，就可以確保終端機捕捉中文輸入時採用正確編碼，順利解決報錯。
 
 ### MCP 跟上週的 Tool Calling 有什麼不同？
 
-> 用自己的話說說，做完後你覺得 MCP 的好處是什麼
+> MCP 的好處在於將 Tool 的開發實作與 Agent 模型「完全解耦」。以前上週寫的 Tool Calling 必須將函式直接寫在 Agent 所在的同一個專案或模組裡；現在透過 MCP，我們可以把功能獨立發布成一個伺服器。不僅所有語言皆能互通，甚至未來這套開發好的 Server 換成別家的大型語言模型（比如 Claude）也都能無縫接軌使用，無需修改任何一行旅遊搜尋或天氣查詢的原始碼。這讓工具的維護、發布與擴充性變得非常強大。
+
