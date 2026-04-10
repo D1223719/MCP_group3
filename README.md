@@ -11,23 +11,20 @@
 
 | Tool 名稱                 | 功能說明            | 負責組員 |
 | ------------------------- | ------------------- | -------- |
-| `fetch_weather`           | 查詢指定城市即時天氣 |          |
-| `web_search`              | 搜尋景點、美食等資訊 |          |
-| `travel_search`           | 進階旅遊與美食搜尋   |          |
-| `travel_trivia`           | 取得旅途知識問答題   |          |
+| `tools/weather_tool.py`       | 查詢指定城市即時天氣 |  辛晴        |
+| `tools/travel_search_tool.py`    | 搜尋景點、美食等資訊 | 蔡秉倫  |
+|`tools/get_trivia.py`   | 取得旅途知識問答題   |  楊永蘭 |
 
 ---
-
 ## 組員與分工
 
 | 姓名 | 負責功能            | 檔案          | 使用的 API |
 | ---- | ------------------- | ------------- | ---------- |
-|      |                     | `tools/weather_tool.py`       | wttr.in API       |
-|      |                     | `tools/web_search_tool.py`    | DuckDuckGo API    |
-|      |                     | `tools/travel_search_tool.py` | DuckDuckGo API    |
-|      |                     | `tools/get_trivia.py`         | OpenTDB API       |
-|      | Resource + Prompt   | `server.py` | —         |
-|      | Agent（用 AI 產生） | `agent.py`  | Gemini API |
+| 辛晴  | 查詢指定城市即時天氣 | `tools/weather_tool.py`       | wttr.in API       |
+| 蔡秉倫 |  搜尋景點、美食等資訊 | `tools/travel_search_tool.py` | DuckDuckGo API    |
+| 楊永蘭 |  取得旅途知識問答題   | `tools/get_trivia.py`         | OpenTDB API       |
+| 黃國傑 | Resource + Prompt   | `server.py` | Gemini API |
+| 黃國傑 | Agent（用 AI 產生） | `agent.py`  | Gemini API |
 
 ---
 
@@ -78,16 +75,24 @@ python agent.py
 ### MCP Inspector 截圖
 
 > 貼上 Inspector 的截圖（Tools / Resources / Prompts 三個分頁都要有）
+> <img width="1914" height="963" alt="image" src="https://github.com/user-attachments/assets/a7d4bbb3-166b-4be8-8078-24237e3938ec" />
+> <img width="1905" height="964" alt="image" src="https://github.com/user-attachments/assets/d931481b-c6f0-4b76-ab1e-dd90ac7e6447" />
+<img width="1498" height="595" alt="image" src="https://github.com/user-attachments/assets/82c14fae-fb28-4032-bc08-9ca3469d0b63" />
+<img width="708" height="532" alt="image" src="https://github.com/user-attachments/assets/cbc62e04-55ba-4151-a252-7a06fffb0829" />
+<img width="708" height="532" alt="image" src="https://github.com/user-attachments/assets/c0bb9d21-34b1-42da-9a0f-adf4e06fc05e" />
+
 
 ### Agent 對話截圖
 
 > 貼上 Agent 對話的截圖（顯示 Gemini 呼叫 Tool 的過程，以及使用 /use 呼叫 Prompt 的結果）
+<img width="468" height="737" alt="image" src="https://github.com/user-attachments/assets/e22b30fd-2d4e-4a6a-a249-089f85c0efc0" />
+<img width="747" height="522" alt="image" src="https://github.com/user-attachments/assets/23932b73-29cb-418b-bc85-46768c2254b6" />
 
 ---
 
 ## 各 Tool 說明
 
-### `fetch_weather`（負責：姓名）
+### `fetch_weather`（負責：辛晴）
 
 - **功能**：取得指定城市的即時天氣資訊，包含溫度、體感溫度和天氣狀況。當使用者詢問天氣、溫度、是否該帶傘時使用。
 - **使用 API**：https://wttr.in/{city}?format=j1
@@ -101,7 +106,7 @@ python agent.py
 
 ---
 
-### `web_search`（負責：姓名）
+### `web_search`（負責：蔡秉倫）
 
 - **功能**：使用 DuckDuckGo 搜尋景點、美食等旅遊資訊，回傳前 5 筆結果。當查詢特定地區景點或推薦美食時使用。
 - **使用 API**：duckduckgo-search 套件
@@ -112,29 +117,11 @@ python agent.py
 
 1. **台北美食總整理**
 2. **2026必吃在地小吃**
-```
+
 
 ---
-
-### `travel_search`（負責：姓名）
-
-- **功能**：進階旅遊與美食搜尋，除標題外還附帶摘要與參考連結，並且可指定回傳結果數量。
-- **使用 API**：duckduckgo-search 套件
-- **參數**：
-  - `query` (字串型態) - 搜尋關鍵字。
-  - `max_results` (整數) - 最多回傳幾筆資料，預設為 5 筆。
-- **回傳範例**：
-```text
-🔍 關於「台南 國華街 美食」的搜尋結果（取前 3 筆）：
-
-1. 首選排隊美食名稱
-   摘要：這是當地非常經典的...
-   參考連結：https://...
 ```
-
----
-
-### `travel_trivia`（負責：姓名）
+### `travel_trivia`（負責：楊永蘭）
 
 - **功能**：取得隨機的旅途知識問答題（四選一），增加旅途趣味，提供長途搭車時娛樂。
 - **使用 API**：Open Trivia Database (https://opentdb.com/api.php)
